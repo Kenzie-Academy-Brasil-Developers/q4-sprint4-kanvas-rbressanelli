@@ -1,60 +1,453 @@
-# Relatório de testes
+<h1>KANVAS</h1>
 
-Todas as atividades do trimestre possuem requisitos mínimos obrigatórios:
+<h2>Método - POST</h2>
+<h2>CRIAÇÃO DE USUÁRIO</h2>
+Na criação do usuário, se a chave is_admin for colocada como True, o usuário será um instrutor, caso seja colocada como False, o usuário será um aluno.</br>
+*endpoint*: /api/accounts/ -> Não precisa de autorização
 
-<section class="hilightedContet">
+<pre>
+Corpo da requisição:
 
-<header>**Importante!**</header>
+{
+    "first_name": "Roberto",
+    "last_name": "Silva",
+    "email": "roberto@mail.com",
+    "password": "Cat7021?", 
+    "is_admin": "False" 
+}
 
-O **formato dos JSONs** de todas as requisições e respostas deve coincidir com os formatos especificados nos enunciados.
+Resposta esperada: 201 - CREATED
 
-As **URLs** definidas devem ser as mesmas especificadas.
+{
+    "uuid": "298e0a8b-f1aa-4396-8fc6-4f08ee69af4c",
+    "is_admin": false,
+    "email": "roberto@mail.com",
+    "first_name": "Roberto",
+    "last_name": "Silva"
+}
 
-Os **códigos de status HTTP** também devem ser iguais aos definidos para as atividades.
 
-</section>
+ERROS:
 
-Para auxiliar na checagem desses requisitos e verificar se tudo está de acordo com essas três regras, serão disponibilizados arquivos de testes para cada atividade. Esses arquivos terão o objetivo de garantir que os requisitos mínimos obrigatórios estão sendo atendidos em seu projeto, além de auxiliar a equipe de ensino durante a correção das atividades.
+Usuário já cadastrado: 422 - UNPROCESSABLE ENTITY
 
-Cada atividade terá um link para seu respectivo arquivo de testes. Basta adicioná-lo à raiz do seu projeto e rodar o seguinte comando:
+{
+    "message": "User already exists"
+}
 
-    python manage.py test -v 2 &> report.txt
+</pre>
+<h2>Método - POST</h2>
+<h2>LOGIN DE USUÁRIO CADASTRADO</h2>
+*endpoint*: /api/login/ -> Não precisa de autorização
 
-O comando executará os testes e adicionará a saída da execução num arquivo chamado `report.txt`. Esse arquivo conterá um relatório dos testes executados e seus respectivos resultados. Caso ele aponte falhas, significa que os requisitos mínimos não estão sendo totalmente cumpridos em seu projeto. Se isso acontecer, o relatório indicará o erro encontrado e apontará o que precisa ser corrigido. Você pode gerar o relatório quantas vezes achar necessário. Apenas a versão final deve ser enviada junto com os demais arquivos do projeto.
+<pre>
+Corpo da requisição:
 
-## Utilizando banco Postgres
+{
+    "email": "roberto212@mail.com",
+    "password": "Cat7021?"
+}
 
-Existe um problema quando rodamos os testes em um banco Postgres, porque ele não reseta os IDs por padrão. Para o caso dos nossos testes, isso é uma pequena dor de cabeça.
+Resposta esperada:
 
-Sendo assim, caso você queira utilizar um banco Postgres em seu projeto, será necessário incluir a configuração do SQLite apenas para rodar os testes.
+{
+    "token": "c921e61e1a27528b6fbfcf5ecbcbff351a187931"
+}
 
-    # settings.py
+ERROS:
 
-    import os
+Tentativa de login de usuário não cadastrado: 401 - UNAUTHORIZED
 
-    ...
+</pre>
+<h2>Método - GET</h2>
+<h2>LISTAGEM DE USUÁRIOS</h2>
+*endpoint*: /api/accounts/ -> Precisa de autenticação de instrutor
 
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': <nome-do-seu-banco>,
-            'USER': <nome-do-user>,
-            'PASSWORD': <senha-do-user>,
-            'HOST': <db-hostname-ou-ip>, # Por estar configurado localmente vai ser no localhost ou 127.0.0.1
-            'PORT': <porta-do-banco> # Por padrão o PostgreSQL roda na porta 5432
-        }
+<pre>
+Sem corpo derequisição
+
+Resposta esperada: 200 - OK
+
+[
+    {
+        "uuid": "c1b2363d-8c00-4d3e-af82-cf2dfd47c6b2",
+        "is_admin": true,
+        "email": "andre@mail.com",
+        "first_name": "Andre",
+        "last_name": "Silva"
+    },
+    {
+        "uuid": "99cc3966-a374-43f6-aeee-af04e65e5da6",
+        "is_admin": false,
+        "email": "ricardo@mail.com",
+        "first_name": "Ricardo",
+        "last_name": "Silva"
     }
+]
 
-    test = os.environ.get('TEST')
+Caso o token não seja válido a resposta será:
+401 - Unauthorized
+{
+    "detail": "Invalid token."
+}
 
-    if test:    
-        DATABASES = {
-            'default': {
-                'ENGINE': 'django.db.backends.sqlite3',
-                'NAME': BASE_DIR / 'db.sqlite3',
+</pre>
+
+<h2>Método - PUT</h2>
+<h2>CADASTRO DE ENDEREÇO PARA USUÁRIO</h2>
+*endpoint*: /api/address/ -> Precisa de autenticação de instrutor
+
+<pre>
+Corpo de requisição:
+
+{
+    "zip_code": "111456009",
+    "street": "Rua da Joana",
+    "house_number": "123",
+    "city": "Curitiba",
+    "state": "Paraná",
+    "country": "Brasil"
+}
+
+Resposta esperada: 200 - OK
+
+[
+    {
+        "uuid": "552c5ac1-bac6-442a-8d20-7f82f0a8e2f4",
+        "street": "Rua das Joana",
+        "house_number": 123,
+        "city": "Curitiba",
+        "state": "Paraná",
+        "zip_code": "111456009",
+        "country": "Brasil",
+        "users": [
+            {
+                "uuid": "7d7d9020-e689-4f05-9d55-1703add6f9ab",
+                "is_admin": false,
+                "email": "andre2@mail.com",
+                "first_name": "Andre",
+                "last_name": "Silva"
+            },
+            {
+                "uuid": "298e0a8b-f1aa-4396-8fc6-4f08ee69af4c",
+                "is_admin": false,
+                "email": "roberto212@mail.com",
+                "first_name": "Roberto",
+                "last_name": "Silva"
             }
+        ]
+    }
+]
+
+</pre>
+
+
+<h2>Método - POST</h2>
+<h2>CRIAÇÃO DE CURSOS</h2>
+*endpoint*: /api/courses/ -> Autorização de instrutor
+
+<pre>
+Corpo de requisição:
+{
+    "name": "Django",
+    "demo_time": "9:00",
+    "link_repo": "https://gitlab.com/turma_django/"
+}
+
+Resposta esperada: 201 - CREATED
+
+{
+    "uuid": "dd748813-55da-4487-9354-74512807dfa6",
+    "name": "Django",
+    "demo_time": "09:00:00",
+    "created_at": "2022-05-11T20:41:41.221468Z",
+    "link_repo": "https://gitlab.com/turma_django/",
+    "instructor": null,
+    "students": []
+}
+
+</pre>
+
+
+<h2>Método - GET</h2>
+<h2>LISTAGEM DE CURSOS</h2>
+*endpoint*: /api/courses/ -> Não necessita de autorização
+
+<pre>
+Sem corpo de requisição
+
+Exemplo de resposta esperada: 200 - OK
+
+{
+    "uuid": "b3ba219c-f569-47d7-87c8-af3a7d1778ba",
+    "name": "Python and Django 22",
+    "demo_time": "09:00:00",
+    "created_at": "2022-05-10T18:09:41.238557Z",
+    "link_repo": "https://gitlab.com/turma_django/",
+    "instructor": null,
+    "students": [
+        {
+            "uuid": "41769111-0fb3-4c1e-8512-2dfb77a61dda",
+            "is_admin": false,
+            "email": "andre@mail.com",
+            "first_name": "Andre",
+            "last_name": "Silva"
+        },
+        {
+            "uuid": "de92af42-c7cf-4588-a597-893b482d78d1",
+            "is_admin": false,
+            "email": "ricardo@mail.com",
+            "first_name": "Ricardo",
+            "last_name": "Silva"
         }
+        ]
+}
 
-No momento de executar, é necessário incluir a variável `TEST` antes do comando.
+</pre>
 
-    TEST=TEST python manage.py test -v 2 &> report.txt
+
+<h2>Método - GET</h2>
+<h2>FILTRAGEM DE UM CURSO ESPECÍFICO PELO ID</h2>
+*endpoint*: /api/courses/<course_id>/ -> Não precisa de autorização
+
+<pre>
+Sem corpo de requisição.
+Passar o id do curso no endpoint da rota
+
+Exemplo de resposta esperada: 200 - OK
+course_id = b3ba219c-f569-47d7-87c8-af3a7d1778ba: 
+
+{
+    "uuid": "b3ba219c-f569-47d7-87c8-af3a7d1778ba",
+    "name": "Python and Django 22",
+    "demo_time": "09:00:00",
+    "created_at": "2022-05-10T18:09:41.238557Z",
+    "link_repo": "https://gitlab.com/turma_django/",
+    "instructor": null,
+    "students": [
+        {
+            "uuid": "41769111-0fb3-4c1e-8512-2dfb77a61dda",
+            "is_admin": false,
+            "email": "andre@mail.com",
+            "first_name": "Andre",
+            "last_name": "Silva"
+        },
+        {
+            "uuid": "de92af42-c7cf-4588-a597-893b482d78d1",
+            "is_admin": false,
+            "email": "ricardo@mail.com",
+            "first_name": "Ricardo",
+            "last_name": "Silva"
+        }
+    ]
+}
+
+ERROS
+
+Se o course_id for inválido: 404 - NOT FOUND
+
+{
+    "message": "Course does not exist"
+}
+
+</pre>
+
+
+<h2>Método - PATCH</h2>
+<h2>ATUALIZAÇÃO DE CURSOS</h2>
+*endpoint*: /api/courses/<course_id>/ -> Autorização de instrutor</br>
+Informar no endpoint da rota o id do curso a ser atualizado.
+
+<pre>
+Endpoint:
+/api/courses/b3ba219c-f569-47d7-87c8-af3a7d1778ba/
+
+Exemplo de corpo de requisição para atualização do nome do curso:
+
+{
+    "name": "Django avançado"	
+}
+
+Resposta esperada: 200 - OK
+
+{
+    "uuid": "b3ba219c-f569-47d7-87c8-af3a7d1778ba",
+    "name": "Django avançado",
+    "demo_time": "09:00:00",
+    "created_at": "2022-05-10T18:09:41.238557Z",
+    "link_repo": "https://gitlab.com/turma_django/",
+    "instructor": null,
+    "students": [
+        {
+            "uuid": "41769111-0fb3-4c1e-8512-2dfb77a61dda",
+            "is_admin": false,
+            "email": "andre@mail.com",
+            "first_name": "Andre",
+            "last_name": "Silva"
+        },
+        {
+            "uuid": "de92af42-c7cf-4588-a597-893b482d78d1",
+            "is_admin": false,
+            "email": "ricardo@mail.com",
+            "first_name": "Ricardo",
+            "last_name": "Silva"
+        }
+    ]
+}
+
+ERROS
+
+Tentativa de atualizar curso inexistente: 404 - NOT FOUND
+
+{
+    "message": "Course does not exist"
+}
+</pre>
+
+<h2>Método - PUT</h2>
+<h2>CADASTRO DE INSTRUTOR NO CURSO</h2>
+*endpoint*: /api/courses/<course_id>/registrations/instructor/ -> Autorização de instrutor
+
+<pre>
+Corpo de requisição:
+{
+    "instructor_id": "93161b66-c3db-489a-b329-55e064462133"
+}
+
+Exemplo de resposta esperada:
+
+{
+    "uuid": "50141964-fae8-44f9-a9f9-c146479fc6ab",
+    "name": "Django",
+    "demo_time": "09:00:00",
+    "created_at": "2022-05-10T20:11:44.731339Z",
+    "link_repo": "https://gitlab.com/turma_django/",
+    "instructor": {
+        "uuid": "93161b66-c3db-489a-b329-55e064462133",
+        "is_admin": true,
+        "email": "andre255@mail.com",
+        "first_name": "Andre",
+        "last_name": "Silva"
+    },
+    "students": []
+}
+
+
+ERROS
+
+1 - Se o id pertencer a um estudante: 422 - UNPROCESSABLE ENTITY
+
+{
+    "message": "Instructor id does not belong to an admin"
+}
+       
+
+2 - Se for informado um course_id inválido: 404 - NOT FOUND
+
+{
+    "message": "Course does not exist"
+}
+
+3 - Caso seja informado um instructor_id que não pertença a um instrutor: 404 - NOT FOUND
+
+{
+    "message": "Invalid instructor_id"
+}
+
+</pre>
+
+
+<h2>Método - PUT</h2>
+<h2>CADASTRO DE ESTUDANTES NO CURSO</h2>
+*endpoint*: /api/courses/<course_id>/registrations/students/ -> Autorização de instrutor
+
+<pre>
+Corpo de requisição:
+
+{
+    "students_id": [
+        "de92af42-c7cf-4588-a597-893b482d78d1",
+        "41769111-0fb3-4c1e-8512-2dfb77a61dda"
+    ]
+}
+
+Exemplo de resposta: 200 - OK
+
+{
+    "uuid": "b3ba219c-f569-47d7-87c8-af3a7d1778ba",
+    "name": "Python and Django 22",
+    "demo_time": "09:00:00",
+    "created_at": "2022-05-10T18:09:41.238557Z",
+    "link_repo": "https://gitlab.com/turma_django/",
+    "instructor": {
+        "uuid": "93161b66-c3db-489a-b329-55e064462133",
+        "is_admin": true,
+        "email": "andre255@mail.com",
+        "first_name": "Andre",
+        "last_name": "Silva"
+    },
+    "students": [
+        {
+            "uuid": "41769111-0fb3-4c1e-8512-2dfb77a61dda",
+            "is_admin": false,
+            "email": "andre@mail.com",
+            "first_name": "Andre",
+            "last_name": "Silva"
+        },
+        {
+            "uuid": "de92af42-c7cf-4588-a597-893b482d78d1",
+            "is_admin": false,
+            "email": "ricardo@mail.com",
+            "first_name": "Ricardo",
+            "last_name": "Silva"
+        }
+    ]
+}
+
+Observa-se que o campo 'students' é atualizado todas as vezes, ou seja, os estudantes presentes no curso são removidos e os novos adicionados em seu lugar.
+
+ERROS
+
+1 - Somente usuários do tipo estudante podem ser matriculados no curso.
+Caso um id de instrutor seja informado: 422 - UNPROCESSABLE ENTITY
+
+{
+    "message": "Some student id belongs to an Instructor"
+}
+
+2 - Caso seja informado um course_id inválido: 404 - NOT FOUND
+
+{
+    "message": "Course does not exist"
+}
+
+3 - Caso informado um stundent_id inválido: 404 - NOT FOUND
+
+{
+    "message": "Invalid students_id list"
+}
+
+</pre>
+
+
+
+<h2>Método - DELETE</h2>
+<h2>DELETAR CURSOS</h2>
+*endpoint*: /api/courses/<course_id>/ -> Autorização de instrutor
+
+<pre>
+Sem corpo de requisição
+
+Sem corpo de resposta: 204 NO CONTENT
+
+ERROS
+
+Caso seja informado um course_id inválido: 404 - NOT FOUND
+
+{
+    "message": "Course does not exist"
+}
+
+
+</pre>
+
