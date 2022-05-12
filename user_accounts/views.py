@@ -1,12 +1,10 @@
 from urllib import request
-from wsgiref.util import request_uri
 
 from django.contrib.auth import authenticate
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.authtoken.models import Token
-from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -14,8 +12,6 @@ from user_accounts.permissions import Authenticated
 
 from .models import KanvasUser
 from .serializers import KanvasUserLoginSerializer, KanvasUserSerializer
-
-# Create your views here.
 
 
 class KanvasUserView(APIView):

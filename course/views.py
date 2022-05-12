@@ -1,20 +1,14 @@
-from turtle import clear
-from urllib.request import Request
-from wsgiref.util import request_uri
-
 from django.db import IntegrityError
 from django.http import Http404
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.authentication import TokenAuthentication
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from course.models import Course
 from course.permissions import Authenticated
 from user_accounts.models import KanvasUser
-from user_accounts.serializers import KanvasUserSerializer
 
 from .serializers import (CourseInstructorUUIDSerializer,
                           CoursePatchSerializer, CourseSerializer,

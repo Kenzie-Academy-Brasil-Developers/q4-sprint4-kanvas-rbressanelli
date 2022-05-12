@@ -4,8 +4,6 @@ from django.db import models
 
 from user_accounts.models import KanvasUser
 
-# Create your models here.
-
 
 class Course(models.Model):
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

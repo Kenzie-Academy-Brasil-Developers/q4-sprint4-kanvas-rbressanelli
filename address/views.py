@@ -1,4 +1,3 @@
-from django.shortcuts import get_object_or_404, render
 from rest_framework import status
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
@@ -7,7 +6,6 @@ from rest_framework.views import APIView
 
 from address.models import Address
 from user_accounts.models import KanvasUser
-from user_accounts.serializers import KanvasUserSerializer
 
 from .serializers import AddressSerializer
 
@@ -42,7 +40,6 @@ class AddressView(APIView):
         user.update(address=new_address)
 
         address = Address.objects.filter(pk=new_address.uuid)
-        # address.update(users=user[0])
 
         serializer = AddressSerializer(address[0])
 
