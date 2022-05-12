@@ -106,14 +106,10 @@ class CourseView(APIView):
             serializer = CourseSerializer(course[0])
             return Response(serializer.data, status=status.HTTP_200_OK)
 
-        except Http404:
+        except (Http404, IndexError):
             return Response(
                 {"message": "Course does not exist"}, status=status.HTTP_404_NOT_FOUND
-            )
-        except IndexError:
-            return Response(
-                {"message": "Course does not exist"}, status=status.HTTP_404_NOT_FOUND
-            )
+            )       
 
     def put(self, request, course_id):
         serializer = CourseUUIDSerializer(data={"course_id": course_id})
@@ -203,12 +199,7 @@ class CourseView(APIView):
                 output_response = "Invalid students_id list"
             return Response(
                 {"message": f"{output_response}"}, status=status.HTTP_404_NOT_FOUND
-            )
-        except IntegrityError:
-            return Response(
-                {"details": "Instructor already registered to another course"},
-                status=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            )
+            )        
 
     def delete(self, request, course_id):
         serializer = CourseUUIDSerializer(data={"course_id": course_id})
