@@ -1,5 +1,7 @@
 <h1>KANVAS</h1>
 
+<h2>O diagrama de relacionamento encontra-se na raiz do projeto.</h2>
+</br>
 <h2>Método - POST</h2>
 <h2>CRIAÇÃO DE USUÁRIO</h2>
 Na criação do usuário, se a chave is_admin for colocada como True, o usuário será um instrutor, caso seja colocada como False, o usuário será um aluno.</br>
@@ -404,7 +406,7 @@ Exemplo de resposta: 200 - OK
     ]
 }
 
-Observa-se que o campo 'students' é atualizado todas as vezes, ou seja, os estudantes presentes no curso são removidos e os novos adicionados em seu lugar.
+Observa-se que o campo 'students' é atualizado todas as vezes, ou seja, os estudantes</br> presentes no curso são removidos e os novos adicionados em seu lugar.
 
 ERROS
 

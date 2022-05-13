@@ -61,20 +61,25 @@ class KanvasUserView(APIView):
 
 class KanvasUserLoginView(APIView):
     def post(self, request):
-        serializer = KanvasUserLoginSerializer(data=request.data)
+        
+        try:
+            serializer = KanvasUserLoginSerializer(data=request.data)
 
-        if not serializer.is_valid():
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            
+            if not serializer.is_valid():
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        user = authenticate(
-            email=serializer.validated_data["email"],
-            password=serializer.validated_data["password"],
-        )
+            user = authenticate(
+                email=serializer.validated_data["email"],
+                password=serializer.validated_data["password"],
+            )
+            
+            if user is not None:
+                token = Token.objects.get_or_create(user=user)[0]
 
-        if user is not None:
-            token = Token.objects.get_or_create(user=user)[0]
+                return Response({"token": token.key})
 
-            return Response({"token": token.key})
-
-        else:
-            return Response(status=status.HTTP_401_UNAUTHORIZED)
+            else:
+                return Response({'details': 'Email and password missmatch.'},status=status.HTTP_401_UNAUTHORIZED)
+        except Exception as err:
+            print(err)

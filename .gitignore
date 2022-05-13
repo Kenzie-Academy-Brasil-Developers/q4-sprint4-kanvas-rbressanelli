@@ -2,3 +2,8 @@
 *.sqlite3
 venv
 __pycache__
+report.txt
+.coverage
+.coveragerc
+htmlcov
+

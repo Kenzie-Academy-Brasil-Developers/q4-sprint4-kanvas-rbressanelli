@@ -109,7 +109,9 @@ class CourseView(APIView):
         except (Http404, IndexError):
             return Response(
                 {"message": "Course does not exist"}, status=status.HTTP_404_NOT_FOUND
-            )       
+            )
+        except KeyError as err:
+            return Response({'details': f'Correct key is {err}.'})       
 
     def put(self, request, course_id):
         serializer = CourseUUIDSerializer(data={"course_id": course_id})
