@@ -92,10 +92,9 @@ class CourseView(APIView):
             )
 
         try:
-
             serializer = CoursePatchSerializer(data=request.data)
             serializer.is_valid(raise_exception=True)
-            name_already_exists = Course.objects.filter(name=request.data["name"])
+            name_already_exists = Course.objects.filter(name=request.data.get("name"))            
             if name_already_exists:
                 return Response(
                     {"message": "This course name already exists"},
